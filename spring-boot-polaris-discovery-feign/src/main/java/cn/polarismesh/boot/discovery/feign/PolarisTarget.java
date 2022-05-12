@@ -22,6 +22,7 @@ import com.tencent.polaris.api.rpc.GetOneInstanceRequest;
 import com.tencent.polaris.api.rpc.InstancesResponse;
 import feign.Request;
 import feign.RequestTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 public class PolarisTarget<T> implements feign.Target<T> {
@@ -73,7 +74,9 @@ public class PolarisTarget<T> implements feign.Target<T> {
         GetOneInstanceRequest getInstancesRequest = new GetOneInstanceRequest();
         getInstancesRequest.setNamespace(namespace);
         getInstancesRequest.setService(service);
-        getInstancesRequest.setMetadata(polarisFeignOptions.getMetadata());
+        if(!CollectionUtils.isEmpty(polarisFeignOptions.getMetadata())){
+            getInstancesRequest.setMetadata(polarisFeignOptions.getMetadata());
+        }
         InstancesResponse instances = consumerAPI.getOneInstance(getInstancesRequest);
         if (instances.getInstances().length == 0) {
             throw new RuntimeException(
