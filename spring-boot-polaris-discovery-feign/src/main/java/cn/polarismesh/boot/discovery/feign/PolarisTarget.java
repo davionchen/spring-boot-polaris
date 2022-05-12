@@ -22,6 +22,7 @@ import com.tencent.polaris.api.rpc.GetOneInstanceRequest;
 import com.tencent.polaris.api.rpc.InstancesResponse;
 import feign.Request;
 import feign.RequestTemplate;
+import org.springframework.util.StringUtils;
 
 public class PolarisTarget<T> implements feign.Target<T> {
 
@@ -56,8 +57,8 @@ public class PolarisTarget<T> implements feign.Target<T> {
     @Override
     public Request apply(RequestTemplate input) {
         Instance instance = choose();
-        setSchema(instance);
-        String url = String.format("%s://%s:%s", polarisFeignOptions.getScheme(),
+        String schema = getSchema(instance);
+        String url = String.format("%s://%s:%s", schema,
                 instance.getHost(), instance.getPort());
         input.header(PolarisFeignConst.HEADER_NAMESPACE, polarisFeignOptions.getNamespace())
                 .header(PolarisFeignConst.HEADER_SERVICE, polarisFeignOptions.getService());
@@ -72,6 +73,7 @@ public class PolarisTarget<T> implements feign.Target<T> {
         GetOneInstanceRequest getInstancesRequest = new GetOneInstanceRequest();
         getInstancesRequest.setNamespace(namespace);
         getInstancesRequest.setService(service);
+        getInstancesRequest.setMetadata(polarisFeignOptions.getMetadata());
         InstancesResponse instances = consumerAPI.getOneInstance(getInstancesRequest);
         if (instances.getInstances().length == 0) {
             throw new RuntimeException(
@@ -81,12 +83,14 @@ public class PolarisTarget<T> implements feign.Target<T> {
     }
 
     /**
-     * 更新schema，如果instance有值，则覆盖
+     * 获取协议
      * @param instance
      */
-    private void setSchema(Instance instance){
-        if(instance.getProtocol()!=null){
-            polarisFeignOptions.setScheme(instance.getProtocol());
+    private String getSchema(Instance instance){
+        if(StringUtils.hasText(instance.getProtocol())){
+            return instance.getProtocol();
+        }else {
+            return polarisFeignOptions.getScheme();
         }
     }
 
