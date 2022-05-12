@@ -16,6 +16,8 @@
 
 package cn.polarismesh.boot.discovery.feign;
 
+import java.util.Map;
+
 import static cn.polarismesh.boot.context.PolarisContextConst.DEFAULT_NAMESPACE;
 import static cn.polarismesh.boot.discovery.feign.PolarisFeignConst.DEFAULT_SCHEME;
 
@@ -26,6 +28,8 @@ public class PolarisFeignOptions {
     private String namespace = DEFAULT_NAMESPACE;
 
     private String service;
+
+    private Map<String,String> metadata;
 
     private PolarisFeignOptions() {
 
@@ -71,6 +75,18 @@ public class PolarisFeignOptions {
 
     public PolarisFeignOptions withService(String service) {
         setService(service);
+        return this;
+    }
+
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
+    }
+    public PolarisFeignOptions withMetadata(Map<String, String> metadata) {
+        setMetadata(metadata);
         return this;
     }
 }

@@ -56,10 +56,12 @@ public class PolarisTarget<T> implements feign.Target<T> {
     @Override
     public Request apply(RequestTemplate input) {
         Instance instance = choose();
+        setSchema(instance);
         String url = String.format("%s://%s:%s", polarisFeignOptions.getScheme(),
                 instance.getHost(), instance.getPort());
         input.header(PolarisFeignConst.HEADER_NAMESPACE, polarisFeignOptions.getNamespace())
                 .header(PolarisFeignConst.HEADER_SERVICE, polarisFeignOptions.getService());
+
         input.target(url);
         return input.request();
     }
@@ -76,6 +78,16 @@ public class PolarisTarget<T> implements feign.Target<T> {
                     String.format("instance not found for service %s, namespace %s", service, namespace));
         }
         return instances.getInstances()[0];
+    }
+
+    /**
+     * 更新schema，如果instance有值，则覆盖
+     * @param instance
+     */
+    private void setSchema(Instance instance){
+        if(instance.getProtocol()!=null){
+            polarisFeignOptions.setScheme(instance.getProtocol());
+        }
     }
 
 }

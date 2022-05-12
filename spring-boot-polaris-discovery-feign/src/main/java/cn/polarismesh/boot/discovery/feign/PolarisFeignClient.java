@@ -88,6 +88,7 @@ public class PolarisFeignClient implements Client {
                 serviceCallResult.setNamespace(namespace);
                 serviceCallResult.setService(service);
                 serviceCallResult.setHost(host);
+                serviceCallResult.setMethod(uri.getPath());
                 serviceCallResult.setPort(port);
                 serviceCallResult.setRetStatus(null != throwable ? RetStatus.RetFail : RetStatus.RetSuccess);
                 serviceCallResult.setRetCode(null != response ? response.status() : -1);
